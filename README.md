@@ -19,4 +19,4 @@ At this moment, we provide API license agreement / software license agreement on
 各サンプルの README.md を参照ください。
 
 ## プロジェクト構成
-* [アプリケーションのサンプル](./web-app-samples/): 
+* [web-app-samples](./web-app-samples/): アプリケーションのサンプル
