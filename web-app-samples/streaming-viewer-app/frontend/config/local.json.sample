@@ -1,0 +1,55 @@
+{
+  "apiBase": "http://localhost:3001/api",
+  "clientId": "",
+  "thetaZoomMaxRange": 8,
+  "defaultLayout": "presentation",
+  "room": {
+    "entranceScreen": "click"
+  },
+  "toolbar": {
+    "isHidden": false,
+    "isHiddenCameraButton": true,
+    "isHiddenMicButton": true,
+    "isHiddenScreenShareButton": true,
+    "isHiddenDeviceSettingButton": true,
+    "isHiddenExitButton": false,
+    "customItems": [{ "type": "log", "iconName": "download" }]
+  },
+  "subView": {
+    "enableAutoVideoReceiving": true,
+    "speakingThreshold": 10,
+    "speakingIndicatorDuration": 500,
+    "isHiddenDrawingButton": true,
+    "drawingInterval": 500,
+    "drawingColor": "#661FFF",
+    "drawingOption": {
+      "size": 8
+    },
+    "theta": {
+      "enableZenithCorrection": true
+    },
+    "normal": {
+      "enableZoom": true
+    },
+    "menu": {
+      "isHidden": false,
+      "isHiddenRecordingButton": false,
+      "isHiddenSharePoVButton": true,
+      "customItems": []
+    }
+  },
+  "theme": {
+    "primary": "#386a20",
+    "background": "#fdfdf5",
+    "surface": "#fdfdf5",
+    "onPrimary": "#fff",
+    "primaryTextColor": "#191c18",
+    "secondaryTextColor": "#43483e",
+    "components": {
+      "video": {
+        "highlightBorderColor": "#19686a",
+        "highlightShadowColor": "#19686a"
+      }
+    }
+  }
+}
