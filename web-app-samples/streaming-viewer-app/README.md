@@ -1,4 +1,4 @@
-# ls-conf-sdk-samples/streaming-viewer-app
+# streaming-viewer-app
 
 `ls-conf-sdk` を使って 映像や音声の受信のみ を行う 閲覧専用 のサンプルアプリケーションです。
 
