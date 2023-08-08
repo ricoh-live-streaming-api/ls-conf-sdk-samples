@@ -30,7 +30,6 @@ const validateIDString = (idString: string): boolean => {
 };
 
 // username / roomId のバリデーション
-// TODO(kdxu): ログイン時のエラー仕様が決定したら、それを踏襲してこのロジックを修正する
 const validateRoomId = (roomId: string): Array<{ key: string; message: string }> => {
   const errors = [];
   if (roomId === '') {

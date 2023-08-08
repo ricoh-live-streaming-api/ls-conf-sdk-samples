@@ -9,7 +9,7 @@ import LoginEntranceFormFieldGroup from '@/components/LoginEntranceFormFieldGrou
 const Entrance: React.FC<Record<string, never>> = () => {
   const params: { roomId: string } = useParams();
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { default_layout, username, bitrate_reservation_mbps, room_type, max_connections } = qs.parse(window.location.search);
+  const { default_layout, username, bitrate_reservation_mbps, room_type, max_connections, ice_servers_protocol } = qs.parse(window.location.search);
   const [roomId, setRoomId] = useState<string>('');
   const onSubmitSuccess = (): void => {
     const encodedUsername = typeof username === 'string' ? encodeURIComponent(username) : undefined;
@@ -38,6 +38,11 @@ const Entrance: React.FC<Record<string, never>> = () => {
     if (max_connections) {
       uriPath += isExistQuery ? '&' : '?';
       uriPath += `max_connections=${max_connections}`;
+      isExistQuery = true;
+    }
+    if (ice_servers_protocol) {
+      uriPath += isExistQuery ? '&' : '?';
+      uriPath += `ice_servers_protocol=${ice_servers_protocol}`;
       isExistQuery = true;
     }
     window.open(uriPath);

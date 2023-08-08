@@ -1,5 +1,5 @@
 {
-  "name": "ls-conf-sample-frontend-viewer",
+  "name": "ls-conf-sample-streaming-viewer",
   "private": true,
   "scripts": {
     "start": "cross-env NODE_ENV=development npx webpack-dev-server --config ./webpack.config --open",

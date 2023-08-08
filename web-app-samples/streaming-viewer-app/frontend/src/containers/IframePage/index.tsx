@@ -7,7 +7,7 @@ import React, { useLayoutEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 
-import { fetchAccessToken } from '@/api';
+import { createAccessTokenSetting, fetchAccessToken } from '@/api';
 import ErrorDialog from '@/components/ErrorDialog';
 import { DEFAULT_LAYOUT, LS_CLIENT_ID, LS_CONF_URL, ROOM_CONFIG, SIGNALING_URL, SUBVIEW_CONFIG, THEME_CONFIG, THETA_ZOOM_MAX_RANGE, TOOLBAR_CONFIG } from '@/constants';
 import LSConferenceIframe, { ConnectOptions, CreateParameters } from '@/lib/ls-conf-sdk';
@@ -26,7 +26,7 @@ const CREATE_PARAMETERS: CreateParameters = {
 
 const IframePage: React.FC<Record<string, never>> = () => {
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { username, default_layout, bitrate_reservation_mbps, room_type, max_connections } = qs.parse(window.location.search);
+  const { username, default_layout, bitrate_reservation_mbps, room_type, max_connections, ice_servers_protocol } = qs.parse(window.location.search);
   const { roomId } = useParams<{ roomId: string }>();
   const iframeContainerRef = useRef<HTMLDivElement>(null);
   const [lsConfIframe, setLsConfIframe] = useState<LSConferenceIframe | null>(null);
@@ -34,9 +34,8 @@ const IframePage: React.FC<Record<string, never>> = () => {
   const showErrorDialog = errorMessage !== null;
   const connectionId: string = uuidv4();
   const displayName = username ?? 'user';
-  const bitrateReservation = bitrate_reservation_mbps && typeof bitrate_reservation_mbps === 'string' ? bitrate_reservation_mbps : undefined;
-  const roomType = room_type && typeof room_type === 'string' ? room_type : undefined;
-  const maxConnections = max_connections && typeof max_connections === 'string' ? max_connections : undefined;
+  const iceServersProtocol =
+    ice_servers_protocol && (ice_servers_protocol === 'all' || ice_servers_protocol === 'udp' || ice_servers_protocol === 'tcp' || ice_servers_protocol === 'tls') ? ice_servers_protocol : undefined;
   const downloadLog = async (iframe: LSConferenceIframe, errorEvent?: ErrorEvent): Promise<void> => {
     let log = 'LSConfSample Log\n\n';
     if (errorEvent) {
@@ -114,19 +113,13 @@ const IframePage: React.FC<Record<string, never>> = () => {
       setErrorMessage(e.message);
       return;
     }
-    let accessToken;
-    try {
-      accessToken = await fetchAccessToken(roomId, connectionId, bitrateReservation, roomType, maxConnections);
-    } catch (e) {
-      setErrorMessage(e.message);
-      return;
-    }
     const connectOptions: ConnectOptions = {
       username: displayName,
       enableVideo: false,
       enableAudio: false,
       mode: 'viewer',
       signalingURL: SIGNALING_URL,
+      iceServersProtocol,
     };
     iframe.addEventListener('error', async (e: ErrorEvent) => {
       // TODO(hase): ChromeのMediaRecorderのバグの暫定対応
@@ -178,6 +171,14 @@ const IframePage: React.FC<Record<string, never>> = () => {
         console.warn('Failed to download log.');
       }
     });
+    let accessToken;
+    try {
+      const accessTokenSetting = createAccessTokenSetting(roomId, connectionId, bitrate_reservation_mbps, room_type, max_connections);
+      accessToken = await fetchAccessToken(accessTokenSetting);
+    } catch (e) {
+      setErrorMessage(e.message);
+      return;
+    }
     try {
       await iframe.join(LS_CLIENT_ID, accessToken, connectOptions);
     } catch (e) {
