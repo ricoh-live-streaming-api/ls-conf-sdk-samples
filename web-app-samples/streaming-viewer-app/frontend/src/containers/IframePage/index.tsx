@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { createAccessTokenSetting, fetchAccessToken } from '@/api';
 import ErrorDialog from '@/components/ErrorDialog';
 import { DEFAULT_LAYOUT, LS_CLIENT_ID, LS_CONF_URL, ROOM_CONFIG, SIGNALING_URL, SUBVIEW_CONFIG, THEME_CONFIG, THETA_ZOOM_MAX_RANGE, TOOLBAR_CONFIG } from '@/constants';
-import LSConferenceIframe, { ConnectOptions, CreateParameters } from '@/lib/ls-conf-sdk';
+import LSConferenceIframe, { ConnectOptions, CreateParameters, LSConfError, LSConfErrorEvent } from '@/lib/ls-conf-sdk';
 
 const CREATE_PARAMETERS: CreateParameters = {
   defaultLayout: (DEFAULT_LAYOUT as 'gallery' | 'presentation' | 'fullscreen') || undefined,
@@ -36,15 +36,20 @@ const IframePage: React.FC<Record<string, never>> = () => {
   const displayName = username ?? 'user';
   const iceServersProtocol =
     ice_servers_protocol && (ice_servers_protocol === 'all' || ice_servers_protocol === 'udp' || ice_servers_protocol === 'tcp' || ice_servers_protocol === 'tls') ? ice_servers_protocol : undefined;
-  const downloadLog = async (iframe: LSConferenceIframe, errorEvent?: ErrorEvent): Promise<void> => {
+  const downloadLog = async (iframe: LSConferenceIframe, e?: LSConfError | LSConfErrorEvent): Promise<void> => {
     let log = 'LSConfSample Log\n\n';
-    if (errorEvent) {
+    if (e instanceof LSConfError) {
       log += `********** Error Message **********\n`;
-      log += `${errorEvent.message}\n`;
+      log += `${e.message}\n`;
+      log += `********** toReportString() *******\n`;
+      log += `${e.toReportString()}\n`;
+    } else if (e instanceof LSConfErrorEvent) {
+      log += `********** Error Message **********\n`;
+      log += `${e.message}\n`;
+      log += `********** toReportString() *******\n`;
+      log += `${e.error.toReportString()}\n`;
     }
     log += `********** ApplicationLog *********\n`;
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    log += `LSConfSample Version: v${require('../../../../frontend/package.json').version}\n`;
     log += `LSConfURL: ${LS_CONF_URL || 'default'}\n`;
     log += `LSClientID: ${LS_CLIENT_ID || 'unknown'}\n`;
     log += `SignalingURL: ${SIGNALING_URL || 'default'}\n`;
@@ -54,10 +59,6 @@ const IframePage: React.FC<Record<string, never>> = () => {
       log += `${await iframe.getLSConfLog()}\n`;
     } catch {
       log += `Failed to getLSConfLog.\n`;
-    }
-    if (errorEvent && errorEvent.error && errorEvent.error.toReportString) {
-      log += `********** toReportString *********\n`;
-      log += errorEvent.error.toReportString;
     }
     const downLoadLink = document.createElement('a');
     downLoadLink.download = `ls-conf-sample-viewer_${format(new Date(), 'yyyyMMdd_HHmmss')}.log`;
@@ -90,15 +91,11 @@ const IframePage: React.FC<Record<string, never>> = () => {
   };
   const createAndConnectRoom = async (): Promise<void> => {
     if (!displayName || !roomId || typeof displayName !== 'string') {
-      // 現在 ls-conf-sdk への対応と同様にエラーをそのまま errorMessage に入れている
-      // TODO(kdxu): ls-conf-sdk のシステムエラーに対するユーザーへのメッセージが仕様として策定され次第、こちらのエラー文言も合わせて修正する
-      setErrorMessage('INVALID-PARAMETERS');
+      setErrorMessage('入室パラメータが不正です');
       return;
     }
     if (!iframeContainerRef.current) {
-      // 現在 ls-conf-sdk への対応と同様にエラーをそのまま errorMessage に入れている
-      // TODO(kdxu): ls-conf-sdk のシステムエラーに対するユーザーへのメッセージが仕様として策定され次第、こちらのエラー文言も合わせて修正する
-      setErrorMessage('INVALID-IFRAME-CONTAINER');
+      setErrorMessage('iframeContainerが不正です');
       return;
     }
     let iframe: LSConferenceIframe;
@@ -110,7 +107,11 @@ const IframePage: React.FC<Record<string, never>> = () => {
       }
       iframe = await LSConferenceIframe.create(iframeContainerRef.current, CREATE_PARAMETERS);
     } catch (e) {
-      setErrorMessage(e.message);
+      if (e instanceof LSConfError) {
+        setErrorMessage(e.message);
+      } else {
+        setErrorMessage(`Unexpected error occurred: ${e}`);
+      }
       return;
     }
     const connectOptions: ConnectOptions = {
@@ -121,7 +122,7 @@ const IframePage: React.FC<Record<string, never>> = () => {
       signalingURL: SIGNALING_URL,
       iceServersProtocol,
     };
-    iframe.addEventListener('error', async (e: ErrorEvent) => {
+    iframe.addEventListener('error', async (e: LSConfErrorEvent) => {
       // TODO(hase): ChromeのMediaRecorderのバグの暫定対応
       // 既知の問題のNo.23の現象を検知した時にエラー表示を行う。回避方法などの詳細は以下のリンクをご覧ください。
       // cf: https://api.livestreaming.ricoh/document/ricoh-live-streaming-conference-%e6%97%a2%e7%9f%a5%e3%81%ae%e5%95%8f%e9%a1%8c/
@@ -150,7 +151,11 @@ const IframePage: React.FC<Record<string, never>> = () => {
       try {
         await iframe.addRecordingMember(targetSubview, connectionId);
       } catch (e) {
-        console.warn(`Failed to addRecordingMember in startRecording event. Detail: ${JSON.stringify(e.detail)}`);
+        if (e instanceof LSConfError) {
+          console.warn(`Failed to addRecordingMember in startRecording event. Detail: ${JSON.stringify(e.detail)}`);
+        } else {
+          console.warn(`Unexpected error occurred: ${e}`);
+        }
       }
     });
     iframe.addEventListener('stopRecording', async (e: CustomEvent) => {
@@ -159,7 +164,11 @@ const IframePage: React.FC<Record<string, never>> = () => {
       try {
         await iframe.removeRecordingMember(targetSubview, connectionId);
       } catch (e) {
-        console.warn(`Failed to removeRecordingMember in stopRecording event. Detail: ${JSON.stringify(e.detail)}`);
+        if (e instanceof LSConfError) {
+          console.warn(`Failed to removeRecordingMember in stopRecording event. Detail: ${JSON.stringify(e.detail)}`);
+        } else {
+          console.warn(`Unexpected error occurred: ${e}`);
+        }
       }
     });
     // ツールバーのダウンロードボタンを押した場合はログをダウンロードする
@@ -176,17 +185,25 @@ const IframePage: React.FC<Record<string, never>> = () => {
       const accessTokenSetting = createAccessTokenSetting(roomId, connectionId, bitrate_reservation_mbps, room_type, max_connections);
       accessToken = await fetchAccessToken(accessTokenSetting);
     } catch (e) {
-      setErrorMessage(e.message);
+      if (e instanceof Error) {
+        setErrorMessage(`アクセストークンの取得に失敗しました: ${e.message}`);
+      } else {
+        setErrorMessage(`Unexpected error occurred: ${e}`);
+      }
       return;
     }
     try {
       await iframe.join(LS_CLIENT_ID, accessToken, connectOptions);
     } catch (e) {
-      setErrorMessage(e.message);
-      try {
-        await downloadLog(iframe, e);
-      } catch {
-        console.warn('Failed to download log.');
+      if (e instanceof LSConfError) {
+        setErrorMessage(e.message);
+        try {
+          await downloadLog(iframe, e);
+        } catch {
+          console.warn('Failed to download log.');
+        }
+      } else {
+        setErrorMessage(`Unexpected error occurred: ${e}`);
       }
       return;
     }
