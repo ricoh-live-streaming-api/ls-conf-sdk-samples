@@ -1,30 +1,7 @@
 // 共通の型定義置き場
-import { Action } from 'redux';
-import { ThunkAction } from 'redux-thunk';
 // 現在 redux state には何も状態を持っていない
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface RootState {}
-// 非同期 Action の型定義
-// XXX(kdxu): thunk 定義をslice ごとに切り分けられたらそうするのが良さそう
-export type RootThunk = ThunkAction<void, RootState, unknown, Action<string>>;
-// Access Token 取得設定の型定義
-export type AccessTokenSetting = {
-  connection_id: string;
-  room_id: string;
-  room_spec: {
-    type: string;
-    max_connections?: number;
-    media_control?: {
-      bitrate_reservation_mbps?: number;
-    };
-  };
-};
-
-interface ToolbarItem {
-  type: string;
-  iconName: string;
-  tips?: string;
-}
 
 interface SubViewMenuItem {
   type: string;
@@ -35,24 +12,13 @@ interface SubViewMenuItem {
   };
 }
 
-interface ToolbarConfig {
-  isHidden: boolean;
-  isHiddenCameraButton: boolean;
-  isHiddenMicButton: boolean;
-  isHiddenScreenShareButton: boolean;
-  isHiddenParticipantsButton: boolean;
-  isHiddenDeviceSettingButton: boolean;
-  isHiddenExitButton: boolean;
-  customItems: ToolbarItem[];
-}
 interface LSConfSampleConfig {
-  BACKEND_API_BASE: string;
-  LS_CLIENT_ID: string;
-  LS_CONF_URL?: string;
-  LS_SIGNALING_URL: string;
-  THETA_ZOOM_MAX_RANGE: number;
   DEFAULT_LAYOUT: string;
-  TOOLBAR_CONFIG: ToolbarConfig;
+  LS_CONF_URL?: string;
+  THETA_ZOOM_MAX_RANGE: number;
+  PLAYER: {
+    isHiddenVideoControlBar: boolean;
+  };
   SUBVIEW_CONFIG: {
     isHiddenDrawingButton: boolean;
     drawingInterval: number;
@@ -60,23 +26,15 @@ interface LSConfSampleConfig {
     drawingOption: {
       size: number;
     };
-    theta: {
-      enableZenithCorrection: boolean;
-    };
-    enableAutoVideoReceiving: boolean;
     normal: {
       enableZoom: boolean;
+      isHiddenFramerate: boolean;
     };
     menu: {
       isHidden: boolean;
-      isHiddenRecordingButton: boolean;
       isHiddenSharePoVButton: boolean;
       customItems: SubViewMenuItem[];
     };
-  };
-  POD_COORDINATES?: {
-    upperLeft: number[];
-    lowerRight: number[];
   };
   THEME_CONFIG: {
     primary: string;
@@ -107,9 +65,6 @@ interface LSConfSampleConfig {
         highlightShadowColor: string;
       };
     };
-  };
-  ROOM_CONFIG: {
-    entranceScreen: string;
   };
 }
 

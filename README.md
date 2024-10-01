@@ -9,7 +9,6 @@ RICOH Live Streaming Serviceは、映像/音声などのメディアデータや
 詳細は下記Webサイトをご確認ください。
 
 * サービスサイト: https://livestreaming.ricoh/
-  * ソフトウェア開発者向けサイト: https://api.livestreaming.ricoh/
 * ソフトウェア使用許諾契約書 : [Software License Agreement](SoftwareLicenseAgreement.txt)
 
 * NOTICE: This package includes SDK and sample application(s) for "RICOH Live Streaming Service".
@@ -19,4 +18,6 @@ At this moment, we provide API license agreement / software license agreement on
 各サンプルの README.md を参照ください。
 
 ## プロジェクト構成
-* [web-app-samples](./web-app-samples/): アプリケーションのサンプル
+* [web-app-samples](./web-app-samples/): Web アプリケーションのサンプル群
+  * streaming-viewer-app: 映像や音声の受信のみを行う閲覧専用のサンプルアプリケーション
+  * recording-player-app: 録画されたファイルを再生する動画再生専用のサンプルアプリケーション

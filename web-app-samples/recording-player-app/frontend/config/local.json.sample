@@ -1,0 +1,54 @@
+{
+  "defaultLayout": "gallery",
+  "thetaZoomMaxRange": 8,
+  "player": {
+    "isHiddenVideoControlBar": false
+  },
+  "subView": {
+    "isHiddenDrawingButton": true,
+    "drawingInterval": 500,
+    "drawingColor": "#661FFF",
+    "drawingOption": {
+      "size": 8
+    },
+    "normal": {
+      "enableZoom": false,
+      "isHiddenFramerate": true
+    },
+    "menu": {
+      "isHidden": false,
+      "isHiddenSharePoVButton": false,
+      "customItems": []
+    }
+  },
+  "theme": {
+    "primary": "#303030",
+    "background": "#f7f7fa",
+    "surface": "#fff",
+    "onPrimary": "#fff",
+    "primaryTextColor": "rgba(0, 0, 0, 0.87)",
+    "secondaryTextColor": "rgba(0, 0, 0, 0.60)",
+    "disabledTextColor": "rgba(0, 0, 0, 0.38)",
+    "components": {
+      "participantsVideoContainer": {
+        "background": "rgba(0, 0, 0, 0.05)",
+        "subViewSwitchBackgroundColor": "#fff",
+        "subViewSwitchIconColor": "rgba(0, 0, 0, 0.87)"
+      },
+      "toolbar": {
+        "background": "#303030",
+        "iconColor": "#fff"
+      },
+      "video": {
+        "background": "#000",
+        "textColor": "#fff",
+        "textBackgroundColor": "#000",
+        "iconColor": "#fff",
+        "menuBackgroundColor": "#fff",
+        "menuTextColor": "rgba(0, 0, 0, 0.87)",
+        "highlightBorderColor": "#661fff",
+        "highlightShadowColor": "#661fff"
+      }
+    }
+  }
+}
