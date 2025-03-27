@@ -10,6 +10,7 @@
     "isHidden": false,
     "isHiddenCameraButton": true,
     "isHiddenMicButton": true,
+    "isHiddenSpeakerButton": false,
     "isHiddenScreenShareButton": true,
     "isHiddenDeviceSettingButton": true,
     "isHiddenExitButton": false,

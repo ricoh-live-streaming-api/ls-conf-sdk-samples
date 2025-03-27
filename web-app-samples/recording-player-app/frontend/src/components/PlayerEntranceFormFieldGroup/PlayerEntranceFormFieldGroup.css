@@ -45,7 +45,7 @@ h1 {
 
 .mdc-tab-indicator .mdc-tab-indicator__content--underline {
   opacity: 1;
-  border-color: rgba(0, 0, 0, 0.12);
+  border-color: rgb(0 0 0 / 12%);
 }
 
 .mdc-tab-indicator--active .mdc-tab-indicator__content--underline {

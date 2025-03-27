@@ -105,7 +105,7 @@ const IframePage: React.FC<Record<string, never>> = () => {
           isThetaBoolean = true;
         }
         // createPlayer には blob で渡す
-        const source = { url: blob, connectionId: 'local-video', label: '動画1', isTheta: isThetaBoolean };
+        const source = { blob: blob, connectionId: 'local-video', label: '動画1', isTheta: isThetaBoolean };
         videoSource = [source];
       }
       iframe = await LSConferenceIframe.createPlayer(iframeContainerRef.current, videoSource, CREATE_PARAMETERS);
